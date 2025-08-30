@@ -1,28 +1,74 @@
-import { Box, Typography } from "@mui/material"
+import { Box, Card, CardActionArea, CardContent, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react';
 
-interface IProps{
-    question:string;
+interface IProps {
+    id: string,
+    text: string,
+    from: string
 }
 
-const GeneralQuestions = ({question}:IProps)=>{
-return  (<>
-            <Box pt={0} pb={0} mb={4} sx={{ width: "90%" }} className="container">
-                <Box
-                  className="divBox"
-                  display="flex"
-                  flexDirection="column"
-                  sx={{ p: 0, minHeight: 30, maxHeight:150 }}
-                >
-                {/* Texto arriba */}
-                    <Typography variant="subtitle1" pl={1} pr={1} pt={1}>
-                     {question}
-                    </Typography>
+export default function ApprovedSSE({ apiBase = 'https://api-node-i03v.onrender.com' }) {
+  const [items, setItems] = useState<IProps[]>([]); // [{id, ts, text, from, ...}]
 
-                    {/* Íconos abajo a la derecha */}
-                   
-                </Box>
+  useEffect(() => {
+    const es = new EventSource(`${apiBase}/v1/questions/approved/stream`);
+
+    es.addEventListener('approved', (ev) => {
+      try {
+        const q = JSON.parse(ev.data);
+        setItems((prev) => [q, ...prev]);
+      } catch {}
+    });
+
+    // EventSource se reconecta solo; no hay lógica extra
+    return () => es.close();
+  }, [apiBase]);
+
+  return (
+    <div style={{ padding: 16, fontFamily: 'system-ui, sans-serif' }}>
+      <h2>Preguntas</h2>
+        {/* {items.map((q) => (
+          <div key={q.id}>
+            <Box display={'flex'} flexDirection={'column'} alignContent={'center'} border={'black'}>
+                {q.text} {q.from ? <em style={{ opacity: 0.7 }}> </em> : null}
             </Box>
-        </>)
-} 
+          </div>
+        ))} */}
 
-export default GeneralQuestions;
+        <Box
+            sx={{
+                width: '100%',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(min(200px, 100%), 1fr))',
+                gap: 2,
+            }}
+        >
+        {items.map((card, index) => (
+            <Card>
+            <CardActionArea
+                sx={{
+                height: '100%',
+                '&[data-active]': {
+                    backgroundColor: 'action.selected',
+                    '&:hover': {
+                    backgroundColor: 'action.selectedHover',
+                    },
+                },
+                }}
+            >
+                <CardContent sx={{ height: '100%' }}>
+                {/* <Typography variant="h" component="div">
+                    {card.text}
+                </Typography> */}
+                <Typography variant="body2" color="text.primary">
+                    {card.text}
+                </Typography>
+                </CardContent>
+            </CardActionArea>
+            </Card>
+        ))}
+    </Box>
+
+    </div>
+  );
+}

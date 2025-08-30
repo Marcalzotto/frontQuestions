@@ -1,7 +1,7 @@
 import GeneralQuestions from "../components/GeneralQuestions"
 
 const Answers = ()=>{
-    return <><GeneralQuestions question={""} /></>
+    return <><GeneralQuestions/></>
 }
 
 export default Answers;
