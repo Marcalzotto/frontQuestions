@@ -43,13 +43,52 @@ const [arrQ, setArrQ] = useState<QuestionRemoteI[]>([])
  },[])
 
  const send = (id:string) => {
-    const arr = arrQ.filter(q => q.id !== id);
-    setArrQ(arr);
-    console.log("send: "+id);
-    console.log("send: "+arr);
+
+    fetch(`https://api-node-i03v.onrender.com/v1/questions/${id}/approve`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json(); // Parse the JSON response
+        })
+        .then(data => {
+            console.log('Success:', data); // Log the parsed JSON data from the server
+             const arr = arrQ.filter(q => q.id !== id);
+            setArrQ(arr);
+        })
+        .catch(error => {
+            console.error('Error:', error); // Handle any errors during the fetch operation
+        });
  }
 
  const remove = (id:string) => {
+
+    fetch(`https://api-node-i03v.onrender.com/v1/questions/${id}/reject`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json(); // Parse the JSON response
+        })
+        .then(data => {
+            console.log('Success:', data); // Log the parsed JSON data from the server
+             const arr = arrQ.filter(q => q.id !== id);
+            setArrQ(arr);
+        })
+        .catch(error => {
+            console.error('Error:', error); // Handle any errors during the fetch operation
+        });
+
      const arr = arrQ.filter(q => q.id !== id);
     setArrQ(arr);
     console.log("remove: "+id);
